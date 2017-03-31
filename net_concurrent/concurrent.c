@@ -22,7 +22,7 @@ void StartServer()
     socklen_t src_len;           // client
     int client_fd;
     int fds[MAX_CONN]; // manage the already connected fd
-    int curr_conn;     // index of fds
+    int curr_conn;     // count of fds
     int max_fd;      // fds's limit
     int i;
     char buf[1024];  // used to R/W
@@ -66,7 +66,7 @@ void StartServer()
     }
 
     fd_set fdset;
-    max_fd = tcp_fd;
+    max_fd = tcp_fd; // tcp_fd = 3
 
     src_len = sizeof(src_addr);
 
@@ -74,14 +74,13 @@ void StartServer()
 
     while(1)
     {
+        /* 必须重置 */
         FD_ZERO(&fdset);
         FD_SET(tcp_fd, &fdset);
-        FD_SET(0, &fdset); // STDIN_FILENO
-
+        FD_SET(0, &fdset); // add STDIN_FILENO to fdset
         for(i = 0; i < curr_conn; ++i)
         {
             FD_SET(fds[i], &fdset);
-
         }
 
         // select(1) 要监视的 fd 范围，[0, fd + 1)
@@ -98,8 +97,8 @@ void StartServer()
         }
         else if(ret == 0)
         {
-            //perror("timeout");
             //select 无限等待，不可能超时
+            perror("timeout");
             continue;
         }
 
@@ -108,10 +107,7 @@ void StartServer()
         // 继续等待新的 fd 加入...
         if(FD_ISSET(tcp_fd, &fdset))
         {
-
             client_fd = accept(tcp_fd, (struct sockaddr *)&src_addr, &src_len);
-
-            LOG(INFO, client_fd:%d, client_fd);
 
             if(client_fd == -1)
             {
@@ -142,10 +138,10 @@ void StartServer()
             continue;
         }
 
-        // 先检查是否有输入
+        // check if there was an INPUT from bash
         if(FD_ISSET(STDIN_FILENO, &fdset))
         {
-            LOG(INFO,read from stdin...);
+            LOG(INFO,read from bash...);
 
             ret = read(STDIN_FILENO, buf, 1024);
 
@@ -153,6 +149,7 @@ void StartServer()
 
             if(strcmp(buf, "exit") == 0)
             {
+                LOG(INFO, bye~);
                 goto END;
             }
             else
@@ -163,7 +160,7 @@ void StartServer()
         }
 
 
-        // 枚举除 tcp_fd 以外的可读 fd
+        // enum readable fd without STDIN_FILENO 
         for(i = 0; i < curr_conn; ++i)
         {
             LOG(INFO, i:%d\tcurr_conn:%d, i, curr_conn);
@@ -187,13 +184,14 @@ void StartServer()
                 {
                     LOG(INFO, client %d has been disconnected!, fds[i]);
 
-                    close(fds[i]);
+                    close(fds[i]); // do not forget!
 
-                    int j;
-                    for(j = i; j < curr_conn; ++j)
-                    {
-                        fds[j] = fds[j + 1];
-                    }
+                    /* why? e.g. */
+                    /*idx     0 1 2 3 4      0 1 2 3 4      0 1 2 3 4 -> 0 1 2 3*/
+                    /*fd      4 5 6 7 8  ->  4 x 6 7 8 ->   4 8 6 7 8 -> 4 8 6 7*/
+                    /*curr_conn  5                 5            5            4   */
+                    FD_CLR(fds[i], &fdset);
+                    fds[i] = fds[curr_conn - 1];
                     --curr_conn;
 
                     break;
@@ -202,6 +200,7 @@ void StartServer()
                 // bytes > 0
                 LOG(INFO, writing to client %d, fds[i]);
 
+                // abcd   -> abcd\0
                 buf[ret] = '\0';
 
                 if(strcmp("kill", buf) == 0)
@@ -212,7 +211,7 @@ void StartServer()
 
                 printf("read[%d]:%s\n",fds[i], buf);
                 strcat(buf, "\t\t[OK]");
-                write(fds[i], buf, ret + 6); // add \t\t[OK]
+                write(fds[i], buf, ret + 6); // 6 is '\t','\t','[','O','K',']'
 
                 break;
             }
