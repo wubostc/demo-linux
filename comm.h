@@ -18,12 +18,28 @@
 # define ERROR ERROR
 
 # if DEBUG == 1
-#  define LOG(level,format,...) \
+
+#  define _LOG(out, level, format, ...) \
     do{ \
-        fprintf(stderr, "[%d]["#level"] "#format"\n", __LINE__, ##__VA_ARGS__); \
+        fprintf(out, "[%d]["#level"] "#format, __LINE__, ##__VA_ARGS__); \
     }while(0)
+
+#  define LOG(level, format, ...) \
+    do{ \
+        _LOG(stdout, level,format\n, ##__VA_ARGS__); \
+    }while(0)
+
+#  define ELOG(format, ...) \
+    do{ \
+        _LOG(stderr, ERROR, format, ##__VA_ARGS__); \
+        perror(" "); \
+    }while(0)
+
 # else
-#  define LOG(level,format,...)
+
+#  define LOG(level,format, ...)
+#  define ELOG(format, ...)
+
 # endif // LOG
 
 #endif // DEBUG

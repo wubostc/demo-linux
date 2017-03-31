@@ -35,7 +35,8 @@ void StartServer()
 
     if(tcp_fd == -1)
     {
-        perror("socket failed");
+        ELOG(socket failed %d, tcp_fd);
+        /*perror("socket failed");*/
         return;
     }
 
@@ -52,7 +53,8 @@ void StartServer()
 
     if(ret == -1)
     {
-        perror("bind failed");
+        ELOG(bind failed %d, ret);
+        /*perror("bind failed");*/
         close(tcp_fd);
         return;
     }
@@ -60,7 +62,8 @@ void StartServer()
     ret = listen(tcp_fd, MAX_CONN);
     if(ret == -1)
     {
-        perror("listen failed");
+        ELOG(listen failed %d, ret);
+        /*perror("listen failed");*/
         close(tcp_fd);
         return;
     }
@@ -92,13 +95,15 @@ void StartServer()
 
         if(ret < 0)
         {
-            perror("select failed");
+            ELOG(select failed %d, ret);
+            /*perror("select failed");*/
             break;
         }
         else if(ret == 0)
         {
             //select 无限等待，不可能超时
-            perror("timeout");
+            /*perror("timeout");*/
+            ELOG(timeout %d, ret);
             continue;
         }
 
@@ -111,7 +116,8 @@ void StartServer()
 
             if(client_fd == -1)
             {
-                perror("accpet failed");
+                ELOG(accpet failed %d, client_fd);
+                /*perror("accpet failed");*/
                 break;
             }
 
@@ -175,7 +181,7 @@ void StartServer()
 
                 if(ret < 0)
                 {
-                    LOG(WARN, unkown error has occurred! client %d, fds[i]);
+                    ELOG(unkown error has occurred! client %d, fds[i]);
                     close(fds[i]);
 
                     break;
@@ -211,7 +217,7 @@ void StartServer()
 
                 printf("read[%d]:%s\n",fds[i], buf);
                 strcat(buf, "\t\t[OK]");
-                write(fds[i], buf, ret + 6); // 6 is '\t','\t','[','O','K',']'
+                write(fds[i], buf, ret + 7); // '\t','\t','[','O','K',']','\0'
 
                 break;
             }
