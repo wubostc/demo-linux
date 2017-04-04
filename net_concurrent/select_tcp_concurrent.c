@@ -219,7 +219,6 @@ void StartServer()
                 strcat(buf, "\t\t[OK]");
                 write(fds[i], buf, ret + 7); // '\t','\t','[','O','K',']','\0'
 
-                break;
             }
         }
     }

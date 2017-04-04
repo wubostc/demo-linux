@@ -240,8 +240,6 @@ void StartServer()
                 strcat(buf, "\t[OK]");
 
                 write(pfds[i].fd, buf, ret + 5);
-
-                break;
             }
         }
     }
