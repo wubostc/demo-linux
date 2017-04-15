@@ -49,7 +49,7 @@
 #  define LOG(level,format, ...)
 #  define ELOG(format, ...)
 #  define LOGE(format, ...)
-
+#  define LOGI(format, ...)
 
 #endif // DEBUG
 

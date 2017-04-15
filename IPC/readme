@@ -1,0 +1,29 @@
+
+IPC   Inter Process Communication
+广义 所有可以用于进程间通信的对象和方法
+狭义 特指消息队列 信号量 共享内存
+
+消息队列 应用于进程间少量的数据的顺序共享
+信号量   应用于进程间互斥
+共享内存 应用于进程间大量数据的随机共享访问
+
+
+
+ftok      使用某个文件做关键字创建key
+<sys/types.h>
+<sys/ipc.h>
+extern key_t ftok (const char *__pathname, int __proj_id) __THROW;
+
+
+msgget    使用key创建消息队列msqid
+
+msgsnd    往消息队列中写入消息
+msgsnd(2) struct msgbuf
+msgsnd(4) 0:队列満则阻塞  PCI_NOWAIT:队列満则报错
+int msgsnd (int __msqid, const void *__msgp, size_t __msgsz, int __msgflg);
+
+
+
+msgrcv    从消息队列中读取消息
+msgctl    删除消息队列
+
