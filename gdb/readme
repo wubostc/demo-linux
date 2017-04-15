@@ -1,0 +1,81 @@
+
+
+run args...
+
+查看代码
+list line
+list linestart,lineend
+list func
+list file:func
+list file:line
+
+查看变量值
+print
+
+修改变量值
+print var=newval
+
+设置断点
+break line
+break func
+break file:line
+break file:func
+break line/func if cond
+
+监控变量
+watch exp
+
+
+删除断点
+delete index
+
+
+disable/enable index
+
+
+查看断点
+info break
+
+
+单步
+step
+
+结束本次循环
+until
+
+到下一个断点
+continue
+
+执行完函数
+finish
+
+看地址 http://blog.csdn.net/baidu_24256693/article/details/47298513
+x/n addr
+
+
+单步，不进入函数内部
+next
+
+
+查看类型
+ptype
+
+查看数组
+print array
+
+查看内存
+print [*]array@len
+
+跳转
+jump
+
+查看调用栈
+backtrace
+
+
+dump core
+$ ulimit -c unlimited
+$ ./b 111
+111
+段错误 (核心已转储)
+$ gdb file core
