@@ -7,15 +7,36 @@ IPC   Inter Process Communication
 信号量   应用于进程间互斥
 共享内存 应用于进程间大量数据的随机共享访问
 
+$ ipcs
+--------- 消息队列 -----------
+键        msqid      拥有者  权限     已用字节数 消息      
+
+------------ 共享内存段 --------------
+键        shmid      拥有者  权限     字节     连接数  状态      
+0x00000000 851968     wu         600        16777216   2                       
+0x00000000 1343489    wu         600        524288     2          目标       
+0x00000000 950274     wu         600        524288     2          目标       
+0x00000000 1703939    wu         600        524288     2          目标       
+...   
+
+--------- 信号量数组 -----------
+键        semid      拥有者  权限     nsems 
+
+
 
 
 ftok      使用某个文件做关键字创建key
 <sys/types.h>
 <sys/ipc.h>
-extern key_t ftok (const char *__pathname, int __proj_id) __THROW;
+key_t ftok (const char *__pathname, int __proj_id);
 
 
 msgget    使用key创建消息队列msqid
+<sys/types.h>
+<sys/ipc.h>
+<sys/msg.h>
+int msgget(key_t key, int msgflg);
+
 
 msgsnd    往消息队列中写入消息
 msgsnd(2) struct msgbuf
@@ -25,5 +46,34 @@ int msgsnd (int __msqid, const void *__msgp, size_t __msgsz, int __msgflg);
 
 
 msgrcv    从消息队列中读取消息
-msgctl    删除消息队列
+<sys/types.h>
+<sys/ipc.h>
+<sys/msg.h>
+ssize_t msgrcv(int msqid, void *msgp, size_t msgsz, long msgtyp,
+                      int msgflg);
+调用成功后，修改msgid_ds结构体
+ 	msg_lrpid  	设置进程pid
+	msg_qnum	减1
+	msg_rtime	设置当前时间
+
+
+
+msgctl    删除修改查看等消息队列
+<sys/types.h>
+<sys/ipc.h>
+<sys/msg.h>
+int msgctl(int msqid, int cmd, struct msqid_ds *buf);
+cmd
+	IPC_STAT	读取内核中的msqid_ds数据到buf
+	IPC——SET	设置buf中的数据到msqid_ds
+	IPC——RMID	移除消息队列，
+
+
+
+msgflg
+
+
+
+
+
 

@@ -15,7 +15,7 @@
 typedef struct
 {
     long mtype;
-    char mtext[BUFSIZ];
+    char mtext[BUFSIZ]; // the BUFSIZ is 8192 bytes
 } msg_info;
 
 int snd_msg(int msqid, long type, char *buf)
@@ -40,6 +40,13 @@ int snd_msg(int msqid, long type, char *buf)
 int rcv_msg(int msqid, long type, char *buf)
 {
     msg_info msg;
+    /*[> Control commands for `msgctl', `semctl', and `shmctl'.  <]*/
+    /*#define IPC_RMID	0		[> Remove identifier.  <]*/
+    /*#define IPC_SET		1		[> Set `ipc_perm' options.  <]*/
+    /*#define IPC_STAT	2		[> Get `ipc_perm' options.  <]*/
+    /*#ifdef __USE_GNU*/
+    /*# define IPC_INFO	3		[> See ipcs.  <]*/
+    /*#endif*/
     int ret = msgrcv(msqid, &msg, BUFSIZ, type, 0);
 
     if(ret == -1)
@@ -66,6 +73,13 @@ void StartSend(int msqid)
 
         if(type == 0) break;
 
+    /*[> Control commands for `msgctl', `semctl', and `shmctl'.  <]*/
+    /*#define IPC_RMID	0		[> Remove identifier.  <]*/
+    /*#define IPC_SET		1		[> Set `ipc_perm' options.  <]*/
+    /*#define IPC_STAT	2		[> Get `ipc_perm' options.  <]*/
+    /*#ifdef __USE_GNU*/
+    /*# define IPC_INFO	3		[> See ipcs.  <]*/
+    /*#endif*/
         snd_msg(msqid, type, buf);
     }
 }
@@ -91,6 +105,9 @@ void StartRecv(int msqid)
 
 int main(int argc, char *argv[])
 {
+    /*$ ipcs*/
+    /*--------- 消息队列 -----------*/
+    /*键        msqid      拥有者  权限     已用字节数 消息 */
     key_t key;
     int   msqid;
 
@@ -102,6 +119,7 @@ int main(int argc, char *argv[])
         return 0;
     }
 
+    // 根据文件生成 key
     key = ftok(FILENAME, 1);
 
     if(key == -1)
@@ -110,6 +128,12 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+    // IPC_EXCL 不会创建重复的消息
+    // get a msqid by the key
+    /* Mode bits for `msgget', `semget', and `shmget'.  */
+    /*#define IPC_CREAT	01000		[> Create key if key does not exist. <]*/
+    /*#define IPC_EXCL	02000		[> Fail if key exists.  <]*/
+    /*#define IPC_NOWAIT	04000		[> Return error on wait.  <]*/
     msqid = msgget(key, IPC_CREAT /*| IPC_EXCL*/ | 0600);
 
     if(msqid == -1)
