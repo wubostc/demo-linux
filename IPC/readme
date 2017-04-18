@@ -74,6 +74,82 @@ msgflg
 
 
 
+$ ./msg_snd_rcv s
+Send [type msg]:2 aaaabbbb
+Send [type msg]:10 eee2
+Send [type msg]:
 
 
+$ ipcs
+
+--------- 消息队列 -----------
+键        msqid      拥有者  权限     已用字节数 消息      
+0x01060bf1 32768      wu         600        12           2 
+
+
+$ ./msg_snd_rcv r
+Recv:2
+ aaaabbbb
+Recv:
+
+
+$ ipcs
+
+--------- 消息队列 -----------
+键        msqid      拥有者  权限     已用字节数 消息      
+0x01060bf1 32768      wu         600        4            1 
+
+
+$ ./msg_snd_rcv r
+Recv:2
+ aaaabbbb
+Recv:10
+ eee2
+Recv:
+
+
+wu@SVF:~/testdir/demo-linux/IPC$ ipcs
+
+--------- 消息队列 -----------
+键        msqid      拥有者  权限     已用字节数 消息      
+0x01060bf1 32768      wu         600        0            0 
+
+
+
+
+
+
+
+$ ./msg_snd_rcv3 i
+	 perm: output ipc_perm
+	 msqinfo: output msqid_ds
+	 set:     set mode
+	 q:exit
+perm
+-------------------IPC_PERM-----------------
+key   :0x1060bf1
+uid   :1000
+gid   :1000
+cuid  :1000
+cgid  :1000
+mode  :0600      --------> 600
+seq   :1
+--------------------------------------------
+set
+660
+[211][INFO] success set new mode 0660
+	 perm: output ipc_perm
+	 msqinfo: output msqid_ds
+	 set:     set mode
+	 q:exit
+perm
+-------------------IPC_PERM-----------------
+key   :0x1060bf1
+uid   :1000
+gid   :1000
+cuid  :1000
+cgid  :1000
+mode  :0660     --------> 660
+seq   :1
+--------------------------------------------
 
