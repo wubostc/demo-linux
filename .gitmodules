@@ -1,0 +1,3 @@
+[submodule "repidVIM"]
+	path = repidVIM
+	url = https://github.com/wubostc/repidVIM.git
