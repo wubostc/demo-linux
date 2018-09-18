@@ -1,3 +1,9 @@
 [submodule "repidVIM"]
 	path = repidVIM
 	url = https://github.com/wubostc/repidVIM.git
+[submodule "pipe/linux-pipe"]
+	path = pipe/linux-pipe
+	url = https://github.com/wubostc/linux-pipe
+[submodule "process/linux-mulprocess"]
+	path = process/linux-mulprocess
+	url = https://github.com/wubostc/linux-mulprocess
